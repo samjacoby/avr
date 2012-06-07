@@ -16,22 +16,21 @@
  *
  */
 
-int counter=0;
+volatile uint8_t counter = 128;
 
-ISR(TIMER0_COMPA) {
+ISR(SIG_OUTPUT_COMPARE0A) {
 
-    counter++;
 
-    if(counter >= 1000 ) {
+    if(counter == 50 ) {
         PORTB |= (1 << PB4);
     }
 
-    if(counter >= 2000 ) {
+    if(counter == 100 ) {
         PORTB &= ~(1 << PB4);
         counter = 0;
     }
     
-
+    counter++;
 }
 
 
@@ -104,8 +103,6 @@ int main(void) {
 
     // We want the PWM output on PB0 -- so it's got to be set as an output 
     DDRB |= (1 << PB4) | (1 << PB0);
-
-     
 
     // This enables global interrupts now and forever--until they're turned off 
     sei(); 
