@@ -10,8 +10,31 @@
  *
  */
 
+/* Interrupt Code
+ *
+ * This bit of code is executed everytime something magnificent happens
+ *
+ */
+
+ISR(SIG_OUTPUT_COMPARE0A) {
+
+
+
+}
+
+
+
 
 int main(void) {
+
+    /* GTCCR: General Timer/Counter Control Register
+     *
+     * Turn that sucker on and off
+     *
+     */
+
+    // Might as well be off while we're setting up, eh?
+    GTCCR &= ~_BV(TSM);
 
     /* TCCR0A: Timer/Counter Control Register A
      *
@@ -60,8 +83,15 @@ int main(void) {
 
     OCR0A = 0xFF;
 
+    /* We're going to want to trigger some events synchronously with the timer,
+     * so we'll set the TIMSK: Timer/Counter Interrupt Mask here.
+     *
+     */
 
-    // We want PWM output on PB0 -- so set it to an output 
+    TIMSK |= _BV( OCIE1A )
+
+
+    // We want the PWM output on PB0 -- so it's got to be set as an output 
     DDRB |= (1 << PB0);
 
      
@@ -69,20 +99,13 @@ int main(void) {
     // This enables global interrupts now and forever--until they're turned off 
     sei(); 
 
+    // Turn the timer on, stand back, and do nothing. 
+    GTCCR = _BV(TSM);
+
     while(1) {
-        cycle_pin(PB0);
-        cycle_pin(PB1);
-        cycle_pin(PB2);
+    
     }
 
     return 0;
 }
 
-// Cycle @pin for @delay milliseconds
-void cycle_pin(int pin) {
-
-    PORTB |= (1 << pin);
-    _delay_ms(DELAY);
-    PORTB &= ~(1 << pin);
-
-}
