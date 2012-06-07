@@ -49,6 +49,16 @@ int main(void) {
      *
      */
 
+    // Set the clock source to be the internal one, divided by 64.
+    TCCR0B |= _BV( CS01) | _BV( CS00 );
+
+    /* Because we're in CTC mode, we want something in the OCR0A register.
+     * This controls what we're going to see on the 0C0A. 
+     *
+     * Let's start simple with 0xFF.
+     */
+
+    OCR0A = 0xFF;
 
 
     // We want PWM output on PB0 -- so set it to an output 
