@@ -16,16 +16,27 @@
  *
  */
 
-ISR(SIG_OUTPUT_COMPARE0A) {
+int counter=0;
 
+ISR(TIMER0_COMPA) {
 
+    counter++;
+
+    if(counter >= 1000 ) {
+        PORTB |= (1 << PB4);
+    }
+
+    if(counter >= 2000 ) {
+        PORTB &= ~(1 << PB4);
+        counter = 0;
+    }
+    
 
 }
 
 
-
-
 int main(void) {
+
 
     /* GTCCR: General Timer/Counter Control Register
      *
@@ -78,21 +89,21 @@ int main(void) {
     /* Because we're in CTC mode, we want something in the OCR0A register.
      * This controls what we're going to see on the 0C0A. 
      *
-     * Let's start simple with 0xFF.
+     * Let's start simple with 0x0F.
      */
 
-    OCR0A = 0xFF;
+    OCR0A = 0x1F;
 
     /* We're going to want to trigger some events synchronously with the timer,
      * so we'll set the TIMSK: Timer/Counter Interrupt Mask here.
      *
      */
 
-    TIMSK |= _BV( OCIE1A )
+    TIMSK |= _BV( OCIE0A );
 
 
     // We want the PWM output on PB0 -- so it's got to be set as an output 
-    DDRB |= (1 << PB0);
+    DDRB |= (1 << PB4) | (1 << PB0);
 
      
 
