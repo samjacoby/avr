@@ -1,6 +1,7 @@
 #include <inttypes.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <avr/delay.h>
 
 /* 
  * An ADC template. This code sets the ADC to
@@ -31,15 +32,21 @@ int main(void) {
      * Might as well start sampling. It'll be synchronous with the clock, so 
      * it should be fine. There is a 25 cycle start-up anyhow.
      *
+     * ADATE
+     * Enable auto-triggering, which is necessary for free-running mode. We
+     * choose the trigger source in ADCRSB, but it's all zeros for FRM so 
+     * we won't.
+     *
      * ADIE
      * Allow ADC interrupts to report home 
      *
      * ADPS[2:0]
      * These three bits control the prescaling from the system clock.
-     * There is less resolution in the prescaling control for the ADC.
+     * There is less resolution in the prescaling control for the ADC, 
+     * so we want to choose a value that make sense.
      *
      */
-    ADCSRA |= _BV( ADEN ) | _BV( ADSC ) |  _BV( ADIE ) | _BV( ADPS2 ) | _BV( ADPS1 );
+    ADCSRA |= _BV( ADATE ) | _BV( ADEN ) | _BV( ADSC ) |  _BV( ADIE ) | _BV( ADPS2 ) | _BV( ADPS1 );
 
 
     /* GTCCR: General Timer/Counter Control Register
@@ -134,6 +141,5 @@ ISR(SIG_OUTPUT_COMPARE0A) {
 // ADC Complete interrupt
 ISR(SIG_ADC) {
         PORTB ^= (1 << PB4);
-
 }
 
