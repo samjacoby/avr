@@ -12,14 +12,33 @@
  */
 
 
-
-
 int main(void) {
+
+    /* ADCSRA: Analog-Digital Converter Status Register A
+     *
+     * This controls just about everything we're interested in.
+     *
+     * ADEN
+     * Enables the ADC.
+     *
+     * ADSC
+     * Might as well start sampling. It'll be synchronous with the clock, so 
+     * it should be fine. There is a 25 cycle start-up anyhow.
+     *
+     * ADIE
+     * Allow ADC interrupts to report home 
+     *
+     * ADPS[2:0]
+     * These three bits control the prescaling from the system clock.
+     * There is less resolution in the prescaling control for the ADC.
+     *
+     */
+    ADCSRA |= _BV( ADEN ) | _BV( ADSC ) |  _BV( ADIE ) | _BV( ADPS2 ) | _BV( ADPS1 );
 
 
     /* GTCCR: General Timer/Counter Control Register
      *
-     * Turn that sucker on and off
+     * Turn the timer on and off
      *
      */
 
@@ -56,22 +75,17 @@ int main(void) {
      * listen to, and what speed we want to listen at. We just want to use 
      * the onboard clock -- but 1MHz is pretty quick, so we'll reduce the 
      * speed some. This happens by using a prescaler, which automatically
-     * divides the counter speed by certain set values. We'll divide by 64,
-     * which gets us a nice 156.25Mhz on a 1MHz clock--a value
-     * that Brian Mayton <bmayton@media.mit.edu> told me was a good one.
+     * divides the counter speed by certain set values.      
      *
      */
 
-    // Set the clock source to be the internal one, divided by 64.
-    TCCR0B |= _BV( CS01) | _BV( CS00 );
+    // Set the clock source to be the internal one.
+    TCCR0B |= _BV( CS00 );
 
-    /* Because we're in CTC mode, we want something in the OCR0A register.
-     * This controls what we're going to see on the 0C0A. 
-     *
-     * Let's start simple with 0x0F.
-     */
+    // The output frequency is CLK / 2 * (1 + OCROA), so this gives
+    // 8Mhz / 64
 
-    OCR0A = 0x1F;
+    OCR0A = 31;
 
     /* We're going to want to trigger some events synchronously with the timer,
      * so we'll set the TIMSK: Timer/Counter Interrupt Mask here.
