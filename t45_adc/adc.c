@@ -130,16 +130,19 @@ int main(void) {
 
 volatile uint8_t counter = 128;
 
-
-
 // Output Compare Interrupt
 ISR(SIG_OUTPUT_COMPARE0A) {
-
 
 }
 
 // ADC Complete interrupt
+
+uint16_t adc_val = 0; 
 ISR(SIG_ADC) {
-        PORTB ^= (1 << PB4);
+        adc_val++;
+        if(adc_val > 50000) {
+            PORTB ^= (1 << PB4);
+            adc_val = 0;
+        }
 }
 
