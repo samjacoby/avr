@@ -13,6 +13,12 @@
 
 
 int main(void) {
+    
+    /* ADMUX: ADC Multiplexer Selection Register 
+     *
+     * REFS[2:0]
+     * Set voltage reference bits. We'll just use Vcc.
+     */
 
     /* ADCSRA: Analog-Digital Converter Status Register A
      *
@@ -117,18 +123,17 @@ int main(void) {
 
 volatile uint8_t counter = 128;
 
+
+
+// Output Compare Interrupt
 ISR(SIG_OUTPUT_COMPARE0A) {
 
 
-    if(counter == 50 ) {
-        PORTB |= (1 << PB4);
-    }
+}
 
-    if(counter == 100 ) {
-        PORTB &= ~(1 << PB4);
-        counter = 0;
-    }
-    
-    counter++;
+// ADC Complete interrupt
+ISR(SIG_ADC) {
+        PORTB ^= (1 << PB4);
+
 }
 
