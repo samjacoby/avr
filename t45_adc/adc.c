@@ -3,35 +3,15 @@
 #include <avr/interrupt.h>
 
 /* 
- * A PWM template, that uses timers to 
- * generate PWM on an AtTiny45 
+ * An ADC template. This code sets the ADC to
+ * synchronously sample a receive pin, in
+ * quadrature with the transmit from the PWM
  *
  * Sam Jacoby <sjacoby@media.mit.edu>
  *
  */
 
-/* Interrupt Code
- *
- * This bit of code is executed everytime something magnificent happens
- *
- */
 
-volatile uint8_t counter = 128;
-
-ISR(SIG_OUTPUT_COMPARE0A) {
-
-
-    if(counter == 50 ) {
-        PORTB |= (1 << PB4);
-    }
-
-    if(counter == 100 ) {
-        PORTB &= ~(1 << PB4);
-        counter = 0;
-    }
-    
-    counter++;
-}
 
 
 int main(void) {
@@ -115,5 +95,26 @@ int main(void) {
     }
 
     return 0;
+}
+
+/* Interrupt Code
+ * This bit of code is executed everytime something magnificent happens
+ */
+
+volatile uint8_t counter = 128;
+
+ISR(SIG_OUTPUT_COMPARE0A) {
+
+
+    if(counter == 50 ) {
+        PORTB |= (1 << PB4);
+    }
+
+    if(counter == 100 ) {
+        PORTB &= ~(1 << PB4);
+        counter = 0;
+    }
+    
+    counter++;
 }
 
