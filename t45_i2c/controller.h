@@ -16,7 +16,7 @@ extern int16_t sensor_val;
 //void controller_init(void);
 //void controller_task(void);
 
-void controller_set_val(uint16_t status);
+void controller_set_val(int16_t val);
 //void controller_set_torque(int8_t torque);
 
 #endif // __controller_h_

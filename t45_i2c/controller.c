@@ -1,8 +1,9 @@
+#include <stdint.h>
 
 #include "controller.h"
 #include "feed.h"
 
-int16_t sensor_val
+int16_t sensor_val;
 
 /*
 void controller_init(void) {
@@ -10,7 +11,7 @@ void controller_init(void) {
     controller_torque = 0;
 }
 */
-void controller_set_val(uint16_t val) {
+void controller_set_val(int16_t val) {
 
     sensor_val = val;
 }

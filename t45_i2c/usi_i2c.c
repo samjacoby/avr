@@ -1,7 +1,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include "usi_i2c.h"
+#include "usi_i2c_45.h"
 
 static volatile uint8_t i2c_address;
 static volatile i2c_state_t i2c_state;
@@ -24,11 +24,11 @@ void i2c_init(uint8_t address) {
     // Set SCL and SCA high 
     //PORTA1 |= (1<<SCL) | (1<<SDA);
     // Enable output on SCL.
-    DDRA |= (1<<SCL);
+    DDRB |= (1<<SCL);
     // Set the Start Condition Interrupt Enabler (USISIE)
     USICR |= (1<<USISIE);
     // I don't know what this does, but it enables output on PA5.
-    //DDRA |= (1<<PA5);
+    //DDRB |= (1<<PA5);
 }
 
 void i2c_set_address(uint8_t address) {
@@ -67,7 +67,7 @@ ISR(USI_OVF_vect) {
             // Knocks off rw state.
             if( (data>>1) == i2c_address ) {
                 USIDR = 0;
-                DDRA |= (1<<SDA);
+                DDRB |= (1<<SDA);
                 // Clear various vonditions
                 USISR = (1<<USIOIF) | (1<<USIPF) | (1<<USIDC) | 0x0E;
                 // ack chipaddr
@@ -83,29 +83,29 @@ ISR(USI_OVF_vect) {
             }
             break;
         case USI_STATE_ACK_CHIPADDR:
-            DDRA &= ~(1<<SDA);
+            DDRB &= ~(1<<SDA);
             i2c_state = USI_STATE_REGADDR;
             USISR = (1<<USIOIF);
             break;
         case USI_STATE_ACK_CHIPADDR_READ:
-            DDRA |= (1<<SDA);
+            DDRB |= (1<<SDA);
             i2c_state = USI_STATE_READDATA;
             USISR = (1<<USIOIF);
             break;
         case USI_STATE_REGADDR:
             i2c_regaddr = data;
-            DDRA |= (1<<SDA);
+            DDRB |= (1<<SDA);
             USIDR = 0;
             i2c_state = USI_STATE_ACK_DATA;
             USISR = (1<<USIOIF) | 0x0E;
             break;
         case USI_STATE_ACK_DATA:
-            DDRA &= ~(1<<SDA);
+            DDRB &= ~(1<<SDA);
             i2c_state = USI_STATE_DATA;
             USISR = (1<<USIOIF);
             break;
         case USI_STATE_DATA:
-            DDRA |= (1<<SDA);
+            DDRB |= (1<<SDA);
             USIDR = 0;
             i2c_write_reg(i2c_regaddr++, data);
             i2c_state = USI_STATE_ACK_DATA;
@@ -116,7 +116,7 @@ ISR(USI_OVF_vect) {
             //PORTA1 |= (1<<5);
             if(USIDR) {
                 // master NACK'd
-                DDRA &= ~(1<<SDA); 
+                DDRB &= ~(1<<SDA); 
                 USICR &= ~((1<<USIOIE) | (1<<USIWM0));
                 break;
             }
@@ -124,7 +124,7 @@ ISR(USI_OVF_vect) {
         case USI_STATE_READDATA:
             USICR &= ~(1<<USICS0);
             //PORTA1 |= (1<<5);
-            DDRA |= (1<<SDA);
+            DDRB |= (1<<SDA);
             USIDR = i2c_read_reg(i2c_regaddr++);
             USISR = (1<<USIOIF) | (1<<USIPF) | (1<<USIDC);
             i2c_state = USI_STATE_REQ_READACK;
@@ -134,7 +134,7 @@ ISR(USI_OVF_vect) {
             //PORTA1 &= ~(1<<5);
             
             USIDR = 0;
-            DDRA &= ~(1<<SDA);
+            DDRB &= ~(1<<SDA);
             
             USISR = (1<<USIOIF) | (1<<USIPF) | (1<<USIDC) | (0x0E);
             i2c_state = USI_STATE_READ_READACK;

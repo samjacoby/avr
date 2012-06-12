@@ -21,7 +21,7 @@ uint8_t interface_read_reg(uint8_t reg) {
 
 void interface_write_reg(uint8_t reg, uint8_t val) {
     switch(reg) {
-        case REG_SENSOR_VALUE: controller_set_sensor(val); break;
+        case REG_SENSOR_VALUE: controller_set_val(val); break;
     }
 }
 

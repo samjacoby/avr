@@ -12,14 +12,14 @@
 # OBJECTS should list all of the object files for the program (e.g. for each
 # .c file, list a corresponding .o file here.)  APPLICATION just specifies the
 # name of the hex/elf files, and can be whatever you want. 
-OBJECTS = usi_i2c.o interface.o controller.o feed.o  
+OBJECTS = comm.o usi_i2c.o interface.o controller.o feed.o  
 APPLICATION = application
 
 # Set up which MCU you're using, and what programmer, and the clock speed
 # here.
-MCU = attiny45
-PROGRAMMER = avrispmkii
-F_CPU = 1000000UL
+MCU = attiny85
+PROGRAMMER = usbtiny
+F_CPU = 8000000UL
 
 # Make sure you check these fuse settings before actually using them, using
 # fuse settings for the wrong clock setup or chip can make it hard to
