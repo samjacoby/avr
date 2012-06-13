@@ -1,5 +1,6 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <avr/delay.h>
 
 #include "usi_i2c_45.h"
 
@@ -22,13 +23,14 @@ void i2c_init(uint8_t address) {
     // to do something interested. External, negative edge.
     USICR = (1<<USICS1) | (1<<USICS0) | (1<<USIWM1) | (1<<USIWM0);
     // Set SCL and SCA high 
-    //PORTA1 |= (1<<SCL) | (1<<SDA);
+    PORTB |= (1<<SCL) | (1<<SDA);
     // Enable output on SCL.
-    DDRB |= (1<<SCL);
+    // DDRB |= (1<<SCL);
     // Set the Start Condition Interrupt Enabler (USISIE)
     USICR |= (1<<USISIE);
-    // I don't know what this does, but it enables output on PA5.
-    //DDRB |= (1<<PA5);
+
+    DDRB |= (1<<PB4);
+
 }
 
 void i2c_set_address(uint8_t address) {
@@ -45,7 +47,8 @@ void i2c_set_write_fn(i2c_write_fn_t write_fn) {
 
 ISR(USI_START_vect) {
 
-    //PORTA1 |= (1<<5);
+
+    PORTB ^= (1<<PB4);
     USISR = (1<<USISIF) | (1<<USIOIF);
     USICR |= (1<<USIOIE) | (1<<USISIE) | (1<<USIWM0) | (1<<USICS1) | (1<<USICS0);
 
@@ -60,6 +63,7 @@ ISR(USI_START_vect) {
 }
 
 ISR(USI_OVF_vect) {
+
     uint8_t data;
     data = USIBR;
     switch(i2c_state) {

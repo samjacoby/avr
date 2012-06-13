@@ -19,6 +19,7 @@ APPLICATION = application
 # here.
 MCU = attiny85
 PROGRAMMER = usbtiny
+#PROGRAMMER = avrispmkii
 F_CPU = 8000000UL
 
 # Make sure you check these fuse settings before actually using them, using
