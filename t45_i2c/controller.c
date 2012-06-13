@@ -1,7 +1,6 @@
 #include <stdint.h>
 
 #include "controller.h"
-#include "feed.h"
 
 int16_t sensor_val;
 
