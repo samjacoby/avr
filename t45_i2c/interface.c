@@ -5,6 +5,7 @@
 #include "version.h"
 
 uint8_t interface_read_reg(uint8_t reg) {
+
     switch(reg) {
         case REG_SIGNATURE: return FW_SIGNATURE;
         case REG_INITIALS1: return INITIALS1;
