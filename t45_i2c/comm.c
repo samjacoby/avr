@@ -37,13 +37,10 @@ int main(void) {
 
     DDRB |= (1 << PB4);
 
-    uint16_t counter = 0;
-
     while(1) {
-        if(counter == 0) {
-            PORTB ^= (1 << PB4);
-            counter++;
-        }
+
+        PORTB ^= (1 << PB4);
+        _delay_ms(500);
     }
     
     return 0;
