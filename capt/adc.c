@@ -65,16 +65,6 @@ void adc_init(void) {
     ADCSRA |= _BV( ADSC );
 
 
-
-    /* GTCCR: General Timer/Counter Control Register
-     *
-     * Turn the timer on and off
-     *
-     */
-
-    // Might as well be off while we're setting up, eh?
-    GTCCR &= ~_BV(TSM);
-
     /* TCCR0A: Timer/Counter Control Register A
      *
      * Set this register to control what happens on the output pin, 
@@ -132,17 +122,6 @@ void adc_init(void) {
 uint16_t adc_val = 0; 
 
 ISR(SIG_ADC) {
-    // Write this value to the appropriate register every once in awhile
-    PORTB ^= (1 << PB5);
     PORTB ^= (1 << PB4);
     adc_complete = 1;
-
-    /*
-    sample_counter++;
-    adc_val++;
-    if(sample_counter > 20) {
-        interface_write_reg(REG_SENSOR_VALUE, adc_val);
-        sample_counter = 0;
-    }
-    */
 }

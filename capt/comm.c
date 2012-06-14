@@ -26,12 +26,10 @@ void setup(void) {
     i2c_set_write_fn(&interface_write_reg);
 
     // Set up ADC and PWM
-    timer_stop();
+    //timer_stop();
     adc_init();
-    timer_start();
+    //timer_start();
 
-    // Enable debug syncing pin
-    DDRB |= (1 << PB5);
 
 }
 

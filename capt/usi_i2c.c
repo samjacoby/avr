@@ -17,7 +17,6 @@ static volatile i2c_write_fn_t i2c_write_reg = &i2c_write_stub;
 
 void i2c_init(uint8_t address) {
     i2c_address = address;
-
     
     // Sets two-wire mode using SDA and SCL pins. Sets clock
     // to do something interested. External, negative edge.
@@ -48,7 +47,9 @@ void i2c_set_write_fn(i2c_write_fn_t write_fn) {
 ISR(USI_START_vect) {
 
 
+    // Debug toggle
     PORTB ^= (1<<PB4);
+
     USISR = (1<<USISIF) | (1<<USIOIF);
     USICR |= (1<<USIOIE) | (1<<USISIE) | (1<<USIWM0) | (1<<USICS1) | (1<<USICS0);
 
