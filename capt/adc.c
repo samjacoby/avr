@@ -7,13 +7,13 @@
 volatile uint16_t sample_counter = 0;
 volatile uint8_t adc_complete = 0;
 
-// Turn the ADC timer on 
-void adc_start(void) {
+// Hold timer turning configuration 
+void timer_stop(void) {
     GTCCR |= _BV(TSM);
 }
 
-// Turn the ADC timer off
-void adc_stop(void) {
+// Let er' roll. 
+void timer_start(void) {
     GTCCR &= ~_BV(TSM);
 }
 
@@ -29,6 +29,9 @@ void adc_init(void) {
      *
      * NOTE: not used because, well, we don't need to set anything here.
      */
+
+    // This sets pin PB3 as the analog input read
+    ADMUX |= _BV( 3 );
 
     /* ADCSRA: Analog-Digital Converter Status Register A
      *
@@ -57,7 +60,10 @@ void adc_init(void) {
      */
 
     // This is ADC prescaling /64.
-    ADCSRA |= _BV( ADATE ) | _BV( ADEN ) | _BV( ADSC ) |  _BV( ADIE ) | _BV( ADPS2 ) | _BV( ADPS1 );
+    ADCSRA |= _BV( ADATE ) | _BV( ADEN ) | _BV( ADIE ) | _BV( ADPS2 ) | _BV( ADPS1 );
+    //ADCSRA |= _BV( ADATE ) | _BV( ADEN ) | _BV( ADSC ) |  _BV( ADPS2 ) | _BV( ADPS1 );
+    ADCSRA |= _BV( ADSC );
+
 
 
     /* GTCCR: General Timer/Counter Control Register
@@ -115,16 +121,6 @@ void adc_init(void) {
 
     OCR0A = 31;
 
-    /* TIMSK
-     * Timer/Counter Interrupt Mask Register 
-     *
-     * This enables the Timer/Counter0 compare match A interrupt to happen
-     * with OCR0A. 
-     *  
-     */
-
-    //TIMSK |= _BV( OCIE0A );
-
 }
 
 /* Interrupt Code
@@ -137,6 +133,8 @@ uint16_t adc_val = 0;
 
 ISR(SIG_ADC) {
     // Write this value to the appropriate register every once in awhile
+    PORTB ^= (1 << PB5);
+    PORTB ^= (1 << PB4);
     adc_complete = 1;
 
     /*

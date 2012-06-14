@@ -25,12 +25,15 @@ void setup(void) {
     i2c_set_read_fn(&interface_read_reg);
     i2c_set_write_fn(&interface_write_reg);
 
-    // Set up ADC
+    // Set up ADC and PWM
+    timer_stop();
     adc_init();
-    adc_start();
+    timer_start();
+
+    // Enable debug syncing pin
+    DDRB |= (1 << PB5);
 
 }
-
 
 int main(void) {
     setup();
