@@ -14,8 +14,7 @@
 
 void setup(void) {
     // Set the i2c device address;
-    uint8_t device_address;
-    CLKPR = (1 << CLKPCE);
+    uint8_t device_address; CLKPR = (1 << CLKPCE);
     CLKPR = 0;
 
     device_address = 0x4A;

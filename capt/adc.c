@@ -5,6 +5,7 @@
 #include "register_map.h"
 
 volatile uint16_t sample_counter = 0;
+volatile uint8_t adc_complete = 0;
 
 // Turn the ADC timer on 
 void adc_start(void) {
@@ -30,7 +31,32 @@ void adc_init(void) {
      */
 
     /* ADCSRA: Analog-Digital Converter Status Register A
+     *
+     * This controls just about everything we're interested in.
+     *
+     * ADEN
+     * Enables the ADC.
+     *
+     * ADSC
+     * Might as well start sampling. It'll be synchronous with the clock, so 
+     * it should be fine. There is a 25 cycle start-up anyhow.
+     *
+     * ADATE
+     * Enable auto-triggering, which is necessary for free-running mode. We
+     * choose the trigger source in ADCRSB, but it's all zeros for FRM so 
+     * we won't.
+     *
+     * ADIE
+     * Allow ADC interrupts to report home 
+     *
+     * ADPS[2:0]
+     * These three bits control the prescaling from the system clock.
+     * There is less resolution in the prescaling control for the ADC, 
+     * so we want to choose a value that make sense.
+     *
      */
+
+    // This is ADC prescaling /64.
     ADCSRA |= _BV( ADATE ) | _BV( ADEN ) | _BV( ADSC ) |  _BV( ADIE ) | _BV( ADPS2 ) | _BV( ADPS1 );
 
 
@@ -75,13 +101,13 @@ void adc_init(void) {
      * This register controls another range of functions. The key stuff here
      * are the the lower bits, which tell the microcontroller what clock to 
      * listen to, and what speed we want to listen at. We just want to use 
-     * the onboard clock -- but 1MHz is pretty quick, so we'll reduce the 
+     * the onboard clock -- but 8MHz (or 1MHz) is pretty quick, so we'll reduce the 
      * speed some. This happens by using a prescaler, which automatically
      * divides the counter speed by certain set values.      
      *
      */
 
-    // Set the clock source to be the internal one.
+    // Set the clock source to be the internal one. This (CS00) has no prescaling.
     TCCR0B |= _BV( CS00 );
 
     // The output frequency is CLK / 2 * (1 + OCROA), so this gives
@@ -89,11 +115,15 @@ void adc_init(void) {
 
     OCR0A = 31;
 
-    /* We're going to want to trigger some events synchronously with the timer,
-     * so we'll set the TIMSK: Timer/Counter Interrupt Mask here.
+    /* TIMSK
+     * Timer/Counter Interrupt Mask Register 
      *
+     * This enables the Timer/Counter0 compare match A interrupt to happen
+     * with OCR0A. 
+     *  
      */
-    TIMSK |= _BV( OCIE0A );
+
+    //TIMSK |= _BV( OCIE0A );
 
 }
 
@@ -107,10 +137,14 @@ uint16_t adc_val = 0;
 
 ISR(SIG_ADC) {
     // Write this value to the appropriate register every once in awhile
+    adc_complete = 1;
+
+    /*
     sample_counter++;
     adc_val++;
     if(sample_counter > 20) {
         interface_write_reg(REG_SENSOR_VALUE, adc_val);
         sample_counter = 0;
     }
+    */
 }
