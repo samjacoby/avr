@@ -12,7 +12,7 @@
 # OBJECTS should list all of the object files for the program (e.g. for each
 # .c file, list a corresponding .o file here.)  APPLICATION just specifies the
 # name of the hex/elf files, and can be whatever you want. 
-OBJECTS = comm.o usi_i2c.o interface.o controller.o debug.o
+OBJECTS = comm.o usi_i2c.o interface.o controller.o debug.o adc.o
 APPLICATION = application
 
 # Set up which MCU you're using, and what programmer, and the clock speed

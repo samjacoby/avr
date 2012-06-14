@@ -5,6 +5,7 @@
 #include "usi_i2c_45.h"
 #include "interface.h"
 #include "controller.h"
+#include "adc.h"
 
 // Define relevant registers in the slave device
 #include "register_map.h"
@@ -25,12 +26,19 @@ void setup(void) {
     i2c_set_read_fn(&interface_read_reg);
     i2c_set_write_fn(&interface_write_reg);
 
+    // Set up ADC
+    adc_init();
+    adc_start();
 
 }
 
 
 int main(void) {
     setup();
+
+    // We want the PWM output on PB0 -- so it's got to be set as an output 
+    //DDRB |= (1 << PB4) | (1 << PB0);
+
     sei();
 
     while(1) {
