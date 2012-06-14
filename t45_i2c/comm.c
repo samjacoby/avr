@@ -12,12 +12,14 @@
 #include "version.h"
 
 void setup(void) {
-    // Set the i2c device address;
-    uint8_t device_address;
+
     CLKPR = (1 << CLKPCE);
     CLKPR = 0;
 
+    // Set the i2c device address;
+    uint8_t device_address;
     device_address = 0x4A;
+
 
     // Set the device address. This can be loaded from EEPROM if 
     // need be.
@@ -33,8 +35,15 @@ int main(void) {
     setup();
     sei();
 
+    DDRB |= (1 << PB4);
+
+    uint16_t counter = 0;
+
     while(1) {
-    
+        if(counter == 0) {
+            PORTB ^= (1 << PB4);
+            counter++;
+        }
     }
     
     return 0;
