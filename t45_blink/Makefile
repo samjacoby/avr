@@ -17,8 +17,9 @@ APPLICATION = application
 
 # Set up which MCU you're using, and what programmer, and the clock speed
 # here.
-MCU = attiny45
-PROGRAMMER = avrispmkii
+MCU = attiny85
+#PROGRAMMER = avrispmkii
+PROGRAMMER = usbtiny
 F_CPU = 1000000UL
 
 # Make sure you check these fuse settings before actually using them, using

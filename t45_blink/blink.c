@@ -15,24 +15,19 @@
 
 void cycle_pin(int);
 
+#define PIN PB4
+
 int main(void) {
 
     // Set the relevant DDRB pins for output
-    DDRB |= (1 << PB0) | (1 << PB1) | (1 << PB2);
+    DDRB |= (1 << PIN);
+
     while(1) {
-        cycle_pin(PB0);
-        cycle_pin(PB1);
-        cycle_pin(PB2);
+        PORTB |= (1 << PIN);
+        _delay_ms(DELAY);
+        PORTB &= ~(1 << PIN);
+        _delay_ms(DELAY);
     }
 
     return 0;
-}
-
-// Cycle @pin for @delay milliseconds
-void cycle_pin(int pin) {
-
-    PORTB |= (1 << pin);
-    _delay_ms(DELAY);
-    PORTB &= ~(1 << pin);
-
 }
