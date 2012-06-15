@@ -26,10 +26,9 @@ void setup(void) {
     i2c_set_write_fn(&interface_write_reg);
 
     // Set up ADC and PWM
-    //timer_stop();
+    timer_stop();
     adc_init();
-    //timer_start();
-
+    adc_start();
 
 }
 

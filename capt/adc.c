@@ -13,8 +13,12 @@ void timer_stop(void) {
 }
 
 // Let er' roll. 
-void timer_start(void) {
+void adc_start(void) {
+    // 
     GTCCR &= ~_BV(TSM);
+    // Start a conversion
+    ADCSRA |= _BV( ADSC );
+
 }
 
 // Initialize the ADC.
@@ -62,8 +66,7 @@ void adc_init(void) {
     // This is ADC prescaling /64.
     ADCSRA |= _BV( ADATE ) | _BV( ADEN ) | _BV( ADIE ) | _BV( ADPS2 ) | _BV( ADPS1 );
     //ADCSRA |= _BV( ADATE ) | _BV( ADEN ) | _BV( ADSC ) |  _BV( ADPS2 ) | _BV( ADPS1 );
-    ADCSRA |= _BV( ADSC );
-
+    
 
     /* TCCR0A: Timer/Counter Control Register A
      *
@@ -107,8 +110,7 @@ void adc_init(void) {
     TCCR0B |= _BV( CS00 );
 
     // The output frequency is CLK / 2 * (1 + OCROA), so this gives
-    // 8Mhz / 64
-
+    // 8Mhz / 64, or 125KHz.
     OCR0A = 31;
 
 }
@@ -122,6 +124,8 @@ void adc_init(void) {
 uint16_t adc_val = 0; 
 
 ISR(SIG_ADC) {
+    // Pulse for debug
+    PORTB ^= (1 << PB4);
     PORTB ^= (1 << PB4);
     adc_complete = 1;
 }
