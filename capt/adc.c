@@ -65,7 +65,7 @@ void adc_init(void) {
      */
 
     // This is ADC prescaling /128.
-    ADCSRA = _BV( ADATE ) | _BV( ADEN ) | _BV( ADIE ) | _BV( ADPS2 ) | _BV( ADPS1 ) |_BV( ADPS0 );
+    ADCSRA = _BV( ADATE ) | _BV( ADEN ) | _BV( ADIE ) | _BV( ADPS2 );
     ADCSRA |= _BV( ADSC );
 
     /* TCCR0A: Timer/Counter Control Register A
@@ -128,9 +128,10 @@ void adc_init(void) {
     PORTB ^= (1 << PB4);
     PORTB ^= (1 << PB4);
     PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
 
     // Set the clock source to be the internal one. 
-    TCCR0B = _BV( CS01 );
+    TCCR0B = _BV( CS00 );
 
 
     // The output frequency is CLK / 2 * prescale * (1 + OCROA)
