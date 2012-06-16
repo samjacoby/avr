@@ -1,8 +1,8 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include "interface.h"
-#include "register_map.h"
+//#include "interface.h"
+//#include "register_map.h"
 
 volatile uint16_t sample_counter = 0;
 volatile uint8_t adc_complete = 0;
@@ -35,7 +35,8 @@ void adc_init(void) {
      */
 
     // This sets pin PB3 as the analog input read
-    ADMUX |= _BV( 3 );
+    //ADMUX |= _BV( 3 );
+    ADMUX = 0x00;
 
     /* ADCSRA: Analog-Digital Converter Status Register A
      *
@@ -64,9 +65,8 @@ void adc_init(void) {
      */
 
     // This is ADC prescaling /128.
-    ADCSRA |= _BV( ADATE ) | _BV( ADEN ) | _BV( ADIE ) | _BV( ADPS2 ) | _BV( ADPS1 );
-    //ADCSRA |= _BV( ADATE ) | _BV( ADEN ) | _BV( ADSC ) |  _BV( ADPS2 ) | _BV( ADPS1 );
-    
+    ADCSRA = _BV( ADATE ) | _BV( ADEN ) | _BV( ADIE ) | _BV( ADPS2 ) | _BV( ADPS1 ) |_BV( ADPS0 );
+    ADCSRA |= _BV( ADSC );
 
     /* TCCR0A: Timer/Counter Control Register A
      *
@@ -90,7 +90,7 @@ void adc_init(void) {
     // Setting toggle mode and Clear Time on Compare Match
     // We're interested in setting PB1, here, which is OC0B
     
-    TCCR0A |= _BV( COM0B0 ) | _BV ( WGM01 );
+    TCCR0A = _BV( COM0B0 ) | _BV ( WGM01 );
 
     // Set the corresponding PWM pin to output
     DDRB |= _BV( PB1 );
@@ -105,12 +105,42 @@ void adc_init(void) {
      * divides the counter speed by certain set values.      
      *
      */
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
 
-    // Set the clock source to be the internal one. This (CS00) is /1. 
-    TCCR0B |= _BV( CS01 );
+    // Set the clock source to be the internal one. 
+    TCCR0B = _BV( CS01 );
 
-    // The output frequency is CLK / 2 * (1 + OCROA)
-    OCR0A = 25;
+
+    // The output frequency is CLK / 2 * prescale * (1 + OCROA)
+    OCR0A = 31;
+
+    DDRB |= _BV(PB4);
+
+
+    
+    
 
 }
 
@@ -126,5 +156,5 @@ ISR(SIG_ADC) {
     // Pulse for debug
     PORTB ^= (1 << PB4);
     PORTB ^= (1 << PB4);
-    adc_complete = 1;
+    //adc_complete = 1;
 }
