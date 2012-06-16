@@ -63,7 +63,7 @@ void adc_init(void) {
      *
      */
 
-    // This is ADC prescaling /64.
+    // This is ADC prescaling /128.
     ADCSRA |= _BV( ADATE ) | _BV( ADEN ) | _BV( ADIE ) | _BV( ADPS2 ) | _BV( ADPS1 );
     //ADCSRA |= _BV( ADATE ) | _BV( ADEN ) | _BV( ADSC ) |  _BV( ADPS2 ) | _BV( ADPS1 );
     
@@ -106,12 +106,11 @@ void adc_init(void) {
      *
      */
 
-    // Set the clock source to be the internal one. This (CS00) has no prescaling.
-    TCCR0B |= _BV( CS00 );
+    // Set the clock source to be the internal one. This (CS00) is /1. 
+    TCCR0B |= _BV( CS01 );
 
-    // The output frequency is CLK / 2 * (1 + OCROA), so this gives
-    // 8Mhz / 64, or 125KHz.
-    OCR0A = 31;
+    // The output frequency is CLK / 2 * (1 + OCROA)
+    OCR0A = 25;
 
 }
 
