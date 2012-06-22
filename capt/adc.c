@@ -4,8 +4,8 @@
 //#include "interface.h"
 //#include "register_map.h"
 
-volatile uint16_t sample_counter = 0;
 volatile uint8_t adc_complete = 0;
+volatile uint16_t measurement[4];
 
 // Hold timer turning configuration 
 void timer_stop(void) {
@@ -14,8 +14,6 @@ void timer_stop(void) {
 
 // Let er' roll. 
 void adc_start(void) {
-    // 
-    GTCCR &= ~_BV(TSM);
     // Start a conversion
     ADCSRA |= _BV( ADSC );
 
@@ -35,8 +33,7 @@ void adc_init(void) {
      */
 
     // This sets pin PB3 as the analog input read
-    //ADMUX |= _BV( 3 );
-    ADMUX = 0x00;
+    ADMUX |= _BV( 1 ) | _BV( 0 );
 
     /* ADCSRA: Analog-Digital Converter Status Register A
      *
@@ -67,8 +64,15 @@ void adc_init(void) {
     // This is ADC prescaling /16.
     ADCSRA = _BV( ADATE ) | _BV( ADEN ) | _BV( ADIE ) | _BV( ADPS2 );
 
-    // Start conversion now.
-    ADCSRA |= _BV( ADSC );
+    // Enable output on this pin, for debugging on a scope.
+    DDRB |= _BV(PB4);
+
+}
+
+/* Handle the initialization of the PWM 
+ *
+ */
+void pwm_init() {
 
     /* TCCR0A: Timer/Counter Control Register A
      *
@@ -120,7 +124,6 @@ void adc_init(void) {
     PORTB ^= (1 << PB4);
     PORTB ^= (1 << PB4);
     PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
 
     /* TCCR0B: Timer/Counter Control Register B
      *
@@ -140,8 +143,41 @@ void adc_init(void) {
     // The output frequency is CLK / 2 * prescale * (1 + OCROA)
     OCR0A = 31;
 
-    // Enable output on this pin, for syncing purposes.
-    DDRB |= _BV(PB4);
+}
+
+void sensor_read(uint8_t sample_number) {
+    uint8_t read_complete = 0;
+    uint8_t counter = 0;
+    uint8_t phase = 0;
+
+    int16_t sample;
+
+    // Read a number of samples
+    while(!read_complete) {
+
+        // This blocks, waiting for the interrupt to hit.
+        // Once the interrupt is hit, we drop out of the while, and do
+        // everything. 
+        while(!adc_complete);
+        // Read the sample.
+        sample = ADC - 512;
+        // Depending on which reading this is, stash it in the right place
+        if(phase & 2) { 
+            measurement[phase & 1] += sample;
+        } else {
+            measurement[phase & 1] -= sample;
+        }
+        // If we're at the last read, add this to the tally.
+        if(phase == 3) counter++;
+        // Incremement the phase betwee 0 and 3
+        phase = (phase + 1) $ 3;
+        // If we've done all the reading we want to do, go home.
+        if(counter == n) read_complete = 1;
+
+        read_complete = 1;
+
+    }
+
 
 
 }
@@ -152,11 +188,10 @@ void adc_init(void) {
 
 // ADC Complete interrupt
 // This needs some kinds of counter control
-uint16_t adc_val = 0; 
 
 ISR(SIG_ADC) {
     // Pulse for debug
     PORTB ^= (1 << PB4);
     PORTB ^= (1 << PB4);
-    //adc_complete = 1;
+    adc_complete = 1;
 }

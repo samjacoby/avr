@@ -29,9 +29,10 @@ void setup(void) {
     */
 
     // Set up ADC and PWM
-    timer_stop();
+    //timer_stop();
     adc_init();
     adc_start();
+    pwm_init();
 
 }
 
