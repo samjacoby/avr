@@ -64,8 +64,10 @@ void adc_init(void) {
      *
      */
 
-    // This is ADC prescaling /128.
+    // This is ADC prescaling /16.
     ADCSRA = _BV( ADATE ) | _BV( ADEN ) | _BV( ADIE ) | _BV( ADPS2 );
+
+    // Start conversion now.
     ADCSRA |= _BV( ADSC );
 
     /* TCCR0A: Timer/Counter Control Register A
@@ -88,12 +90,37 @@ void adc_init(void) {
      */ 
 
     // Setting toggle mode and Clear Time on Compare Match
-    // We're interested in setting PB1, here, which is OC0B
+    // We're interested in setting PB1, here, which is OC0B, enabled by COM0B0
     
     TCCR0A = _BV( COM0B0 ) | _BV ( WGM01 );
 
     // Set the corresponding PWM pin to output
     DDRB |= _BV( PB1 );
+
+    // Essentially, NOPs to sync up the timer
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
+    PORTB ^= (1 << PB4);
 
     /* TCCR0B: Timer/Counter Control Register B
      *
@@ -103,45 +130,19 @@ void adc_init(void) {
      * the onboard clock -- but 8MHz (or 1MHz) is pretty quick, so we'll reduce the 
      * speed some. This happens by using a prescaler, which automatically
      * divides the counter speed by certain set values.      
-     *
+     * 
      */
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
 
-    // Set the clock source to be the internal one. 
+    // Set the clock source to be the internal one. CS00 is no prescaling. 
     TCCR0B = _BV( CS00 );
 
 
     // The output frequency is CLK / 2 * prescale * (1 + OCROA)
     OCR0A = 31;
 
+    // Enable output on this pin, for syncing purposes.
     DDRB |= _BV(PB4);
 
-
-    
-    
 
 }
 
