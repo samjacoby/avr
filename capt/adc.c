@@ -170,9 +170,9 @@ void sensor_read(uint8_t sample_number) {
         // If we're at the last read, add this to the tally.
         if(phase == 3) counter++;
         // Incremement the phase betwee 0 and 3
-        phase = (phase + 1) $ 3;
+        phase = (phase + 1) & 3;
         // If we've done all the reading we want to do, go home.
-        if(counter == n) read_complete = 1;
+        if(counter == sample_number) read_complete = 1;
 
         read_complete = 1;
 
