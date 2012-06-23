@@ -9,6 +9,7 @@
 #define REG_VERSION_H 0x05
 
 #define REG_SENSOR_VALUE 0x80
+#define REG_SENSOR_QUAD_VALUE 0x81
 
 #endif // __register_map_h_
 

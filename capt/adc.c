@@ -33,7 +33,7 @@ void adc_init(void) {
      */
 
     // This sets pin PB3 as the analog input read
-    ADMUX |= _BV( 1 ) | _BV( 0 );
+    ADMUX = 0x03;
 
     /* ADCSRA: Analog-Digital Converter Status Register A
      *
@@ -159,8 +159,8 @@ void sensor_read(uint8_t sample_number) {
         // Once the interrupt is hit, we drop out of the while, and do
         // everything that follows. 
         while(!adc_complete);
-        // Read the sample, subtracting out the bias.
-        sample = ADC - 512;
+        // Read the sample, subtracting out half...
+        sample = ADC - 128;
         // Depending on which reading this is, stash it in the right place
         if(phase & 2) { 
             measurement[phase & 1] += sample;
@@ -169,7 +169,7 @@ void sensor_read(uint8_t sample_number) {
         }
         // If we're at the last read, add this to the tally.
         if(phase == 3) counter++;
-        // Incremement the phase between 0 and 3
+        // Incremement the phase betweem 0 and 3
         phase = (phase + 1) & 3;
         // If we've done all the reading we want to do, go home.
         if(counter == sample_number) read_complete = 1;
