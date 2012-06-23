@@ -157,9 +157,9 @@ void sensor_read(uint8_t sample_number) {
 
         // This blocks, waiting for the interrupt to hit.
         // Once the interrupt is hit, we drop out of the while, and do
-        // everything. 
+        // everything that follows. 
         while(!adc_complete);
-        // Read the sample.
+        // Read the sample, subtracting out the bias.
         sample = ADC - 512;
         // Depending on which reading this is, stash it in the right place
         if(phase & 2) { 
@@ -169,7 +169,7 @@ void sensor_read(uint8_t sample_number) {
         }
         // If we're at the last read, add this to the tally.
         if(phase == 3) counter++;
-        // Incremement the phase betwee 0 and 3
+        // Incremement the phase between 0 and 3
         phase = (phase + 1) & 3;
         // If we've done all the reading we want to do, go home.
         if(counter == sample_number) read_complete = 1;
@@ -177,9 +177,13 @@ void sensor_read(uint8_t sample_number) {
         read_complete = 1;
 
     }
+}
 
-
-
+/* Deliver the goods back home 
+ */
+void fetch_sensor_read(int16_t *inphase, int16_t *quad) {
+    *inphase = measurement[0];
+    *quad = measurement[1];
 }
 
 /* Interrupt Code
@@ -191,7 +195,7 @@ void sensor_read(uint8_t sample_number) {
 
 ISR(SIG_ADC) {
     // Pulse for debug
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
+    PORTB ^= _BV ( PB4 );
+    PORTB ^= _BV ( PB4 );
     adc_complete = 1;
 }

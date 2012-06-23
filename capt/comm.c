@@ -13,6 +13,9 @@
 // Version information, for late queries and such.
 #include "version.h"
 
+// Keep things around, yah?
+int16_t inphase, quad;
+
 void setup(void) {
     // Set the i2c device address;
     uint8_t device_address; 
@@ -25,6 +28,7 @@ void setup(void) {
     // Set the device address. This can be loaded from EEPROM if need be.
     device_address = 0x4A;
     i2c_init(device_address);
+
     i2c_set_read_fn(&interface_read_reg);
     i2c_set_write_fn(&interface_write_reg);
 
@@ -36,7 +40,9 @@ void setup(void) {
 }
 
 void loop() {
-
+    sensor_read(32);
+    fetch_sensor_read(&inphase, &quad);
+    controller_set_val(inphase);
 }
 
 int main(void) {
