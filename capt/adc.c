@@ -200,7 +200,7 @@ void fetch_sensor_read(int16_t *inphase, int16_t *quad) {
 
 ISR(SIG_ADC) {
     // Pulse for debug
-    PORTB ^= _BV ( PB4 );
-    PORTB ^= _BV ( PB4 );
+//    PORTB ^= _BV ( PB4 );
+//    PORTB ^= _BV ( PB4 );
     adc_complete = 1;
 }

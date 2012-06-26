@@ -1,4 +1,6 @@
 #include <stdint.h>
+#include <avr/io.h>
+
 
 #include "controller.h"
 
@@ -14,19 +16,16 @@ void controller_init(void) {
 }
 */
 void controller_set_val(int16_t val, int16_t quad_val) {
-/*
     // 16 bit values need to be mapped to distinc registers 
-    phase_sensor_val_l = val;
-    phase_sensor_val_h = val >> 8;
-    
-    quad_sensor_val_h = quad_val >> 8;
-    quad_sensor_val_l = quad_val << 8;
-    */
+    if(val < 1024) { 
+        PORTB |= (1 << PB4);
+        PORTB &= ~(1 << PB4);
+    } 
+
     phase_sensor_val_l = val & 0x00ff;
     phase_sensor_val_h = (val & 0xff00) >> 8;
-    
-    quad_sensor_val_h = quad_val & 0x00ff; 
-    quad_sensor_val_l = (quad_val & 0xff00) >> 8; 
+    quad_sensor_val_l = quad_val & 0x00ff; 
+    quad_sensor_val_h = (quad_val & 0xff00) >> 8; 
 }
 /*
 void controller_set_torque(int8_t torque) {
