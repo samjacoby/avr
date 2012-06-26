@@ -42,7 +42,7 @@ void setup(void) {
 void loop() {
     sensor_read(32);
     fetch_sensor_read(&inphase, &quad);
-    controller_set_val(inphase);
+    controller_set_val(inphase, quad);
 }
 
 int main(void) {

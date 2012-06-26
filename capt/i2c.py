@@ -16,10 +16,12 @@ class I2CInterface:
 
     def send_repeat_delay(self, addr, data, rxbytes, delay):
         while(1):
-            sensor_val = self.send(addr, data, rxbytes)
-            sensor_val = ord(sensor_val)
+            sensor_val = ord(self.send(addr, chr(data), rxbytes))
+            sensor_quad_val = ord(self.send(addr, chr(data + 2), rxbytes))
             str = ''.join(['*' for num in xrange(sensor_val/10)])
             print str + ': %d' % sensor_val
+            str2 = ''.join(['#' for num in xrange(sensor_quad_val/10)])
+            print str2 + ': %d' % sensor_quad_val
 
             #    p += '*' 
             #    print p + ":" + sensorval 
@@ -64,7 +66,8 @@ def main(argv):
     data = 0x80;
     rxbytes = 1;
     i2c = I2CInterface(port=argv[0])
-    i2c.send_repeat_delay(addr, chr(data), rxbytes, float(argv[1]))
+    
+    i2c.send_repeat_delay(addr, data, rxbytes, float(argv[1]))
 
 
 if __name__ == "__main__":

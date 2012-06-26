@@ -13,16 +13,19 @@ uint8_t interface_read_reg(uint8_t reg) {
         case REG_INITIALS3: return INITIALS3;
         case REG_VERSION_L: return VERSION_L;
         case REG_VERSION_H: return VERSION_H;
-
-        case REG_SENSOR_VALUE: return sensor_val;
+        case REG_PHASE_SENSOR_VALUE_H: return phase_sensor_val_h;
+        case REG_PHASE_SENSOR_VALUE_L: return phase_sensor_val_l; 
+        case REG_QUAD_SENSOR_VALUE_H: return quad_sensor_val_h; 
+        case REG_QUAD_SENSOR_VALUE_L: return quad_sensor_val_l; 
 
         default: return 0xFF;
     }
 }
 
+/* Don't care about this right now */
 void interface_write_reg(uint8_t reg, uint8_t val) {
     switch(reg) {
-        case REG_SENSOR_VALUE: controller_set_val(val); break;
+        case REG_PHASE_SENSOR_VALUE_H: controller_set_val(val, val); break;
     }
 }
 

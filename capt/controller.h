@@ -11,12 +11,15 @@
 extern uint8_t controller_status;
 extern int8_t controller_torque;
 */
-extern int16_t sensor_val;
+extern int8_t phase_sensor_val_h;
+extern int8_t phase_sensor_val_l;
+extern int8_t quad_sensor_val_h;
+extern int8_t quad_sensor_val_l;
 
 //void controller_init(void);
 //void controller_task(void);
 
-void controller_set_val(int16_t val);
+void controller_set_val(int16_t val, int16_t quad_val);
 //void controller_set_torque(int8_t torque);
 
 #endif // __controller_h_

@@ -5,7 +5,7 @@
 //#include "register_map.h"
 
 volatile uint8_t adc_complete = 0;
-volatile uint16_t measurement[4];
+volatile int16_t measurement[4];
 
 // Hold timer turning configuration 
 void timer_stop(void) {
@@ -102,6 +102,7 @@ void pwm_init() {
     DDRB |= _BV( PB1 );
 
     // Essentially, NOPs to sync up the timer
+/*    PORTB ^= (1 << PB4);
     PORTB ^= (1 << PB4);
     PORTB ^= (1 << PB4);
     PORTB ^= (1 << PB4);
@@ -123,7 +124,7 @@ void pwm_init() {
     PORTB ^= (1 << PB4);
     PORTB ^= (1 << PB4);
     PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
+    */
 
     /* TCCR0B: Timer/Counter Control Register B
      *
@@ -152,6 +153,11 @@ void sensor_read(uint8_t sample_number) {
 
     int16_t sample;
 
+    measurement[0] = 0;
+    measurement[1] = 0;
+    measurement[2] = 0;
+    measurement[3] = 0;
+
     // Read a number of samples
     while(!read_complete) {
 
@@ -160,6 +166,7 @@ void sensor_read(uint8_t sample_number) {
         // everything that follows. 
         while(!adc_complete);
         // Read the sample, subtracting out half...
+        //sample = ADC;
         sample = ADC - 128;
         // Depending on which reading this is, stash it in the right place
         if(phase & 2) { 
@@ -173,8 +180,6 @@ void sensor_read(uint8_t sample_number) {
         phase = (phase + 1) & 3;
         // If we've done all the reading we want to do, go home.
         if(counter == sample_number) read_complete = 1;
-
-        read_complete = 1;
 
     }
 }

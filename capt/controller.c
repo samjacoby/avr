@@ -2,7 +2,10 @@
 
 #include "controller.h"
 
-int16_t sensor_val;
+int8_t phase_sensor_val_h;
+int8_t phase_sensor_val_l;
+int8_t quad_sensor_val_h;
+int8_t quad_sensor_val_l;
 
 /*
 void controller_init(void) {
@@ -10,9 +13,20 @@ void controller_init(void) {
     controller_torque = 0;
 }
 */
-void controller_set_val(int16_t val) {
-
-    sensor_val = val;
+void controller_set_val(int16_t val, int16_t quad_val) {
+/*
+    // 16 bit values need to be mapped to distinc registers 
+    phase_sensor_val_l = val;
+    phase_sensor_val_h = val >> 8;
+    
+    quad_sensor_val_h = quad_val >> 8;
+    quad_sensor_val_l = quad_val << 8;
+    */
+    phase_sensor_val_l = val & 0x00ff;
+    phase_sensor_val_h = (val & 0xff00) >> 8;
+    
+    quad_sensor_val_h = quad_val & 0x00ff; 
+    quad_sensor_val_l = (quad_val & 0xff00) >> 8; 
 }
 /*
 void controller_set_torque(int8_t torque) {
