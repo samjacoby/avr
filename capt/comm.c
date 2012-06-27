@@ -34,15 +34,24 @@ void setup(void) {
 
     // Set up ADC and PWM
     adc_init();
-    adc_start();
     pwm_init();
+    controller_init();
 
 }
 
 void loop() {
+
+    controller_task();
+
+    /*
     sensor_read(32);
     fetch_sensor_read(&inphase, &quad);
+    if(inphase != quad) {
+            PORTB ^= _BV(PIN4);
+            PORTB ^= _BV(PIN4);
+        }
     controller_set_val(inphase, quad);
+    */
 }
 
 int main(void) {

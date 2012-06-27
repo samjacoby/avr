@@ -2,30 +2,66 @@
 #include <avr/io.h>
 
 
+#include "adc.h"
 #include "controller.h"
+
+uint8_t control_status; 
+
+int16_t inphase, quad;
 
 int8_t phase_sensor_val_h;
 int8_t phase_sensor_val_l;
 int8_t quad_sensor_val_h;
 int8_t quad_sensor_val_l;
 
-/*
+// Initialize status
 void controller_init(void) {
-    controller_status = 0;
-    controller_torque = 0;
+    control_status = CONTROL_MODE_STOP;
 }
-*/
-void controller_set_val(int16_t val, int16_t quad_val) {
-    // 16 bit values need to be mapped to distinc registers 
-    if(val < 1024) { 
-        PORTB |= (1 << PB4);
-        PORTB &= ~(1 << PB4);
-    } 
 
-    phase_sensor_val_l = val & 0x00ff;
+
+void controller_set_status_val(uint8_t val) {
+    control_status = val;
+}
+
+/* Read status register, and do the right thing, depending on 
+ * various magic values.
+ */
+
+void controller_task(void) {
+
+    switch(control_status) {
+        case CONTROL_MODE_READ:
+            PORTB ^= _BV(PIN4);
+            PORTB ^= _BV(PIN4);
+            adc_start();
+            pwm_start();
+            sensor_read(32);
+            fetch_sensor_read(&inphase, &quad);
+            controller_set_sensor_val(inphase, quad);
+            control_status = CONTROL_MODE_STOP;
+            break;
+        case CONTROL_MODE_STOP:
+            adc_stop();
+            pwm_stop();
+            break;
+        default:
+            control_status = CONTROL_MODE_STOP;
+    }
+}
+
+
+void controller_set_sensor_val(int16_t val, int16_t quad_val) {
+    // 16 bit values need to be mapped to distinc registers 
     phase_sensor_val_h = (val & 0xff00) >> 8;
-    quad_sensor_val_l = quad_val & 0x00ff; 
+    phase_sensor_val_l = val & 0x00ff;
     quad_sensor_val_h = (quad_val & 0xff00) >> 8; 
+    quad_sensor_val_l = quad_val & 0x00ff; 
+    if(phase_sensor_val_l == 0) {
+        PORTB ^= _BV( PIN4 );
+        PORTB ^= _BV( PIN4 );
+
+    }
 }
 /*
 void controller_set_torque(int8_t torque) {

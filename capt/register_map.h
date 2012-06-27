@@ -8,10 +8,13 @@
 #define REG_VERSION_L 0x04
 #define REG_VERSION_H 0x05
 
+#define REG_CONTROL 0x06
+
 #define REG_PHASE_SENSOR_VALUE_H 0x80
 #define REG_PHASE_SENSOR_VALUE_L 0x81
 #define REG_QUAD_SENSOR_VALUE_H 0x82
 #define REG_QUAD_SENSOR_VALUE_L 0x83
+
 
 #endif // __register_map_h_
 

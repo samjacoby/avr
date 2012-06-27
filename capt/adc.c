@@ -5,18 +5,29 @@
 //#include "register_map.h"
 
 volatile uint8_t adc_complete = 0;
-volatile int16_t measurement[4];
+volatile int16_t measurement[2];
 
-// Hold timer turning configuration 
-void timer_stop(void) {
-    GTCCR |= _BV(TSM);
+void pwm_start(void) {
+    // Set the clock source to be the internal one. CS00 is no prescaling. 
+    TCCR0B = _BV( CS00 );
+}
+
+void pwm_stop(void) {
+    // Clear clock bits to disable PWM 
+    TCCR0B &= 0xf8;
 }
 
 // Let er' roll. 
 void adc_start(void) {
     // Start a conversion
+    ADCSRA |= _BV( ADEN );
     ADCSRA |= _BV( ADSC );
 
+}
+
+void adc_stop(void) {
+    // Disable conversion
+    ADCSRA &= ~(_BV( ADEN ) | _BV( ADSC ));
 }
 
 // Initialize the ADC.
@@ -74,6 +85,9 @@ void adc_init(void) {
  */
 void pwm_init() {
 
+    // Initiliazing the PWM settings shouldn't start it off rolling.
+    pwm_stop();
+
     /* TCCR0A: Timer/Counter Control Register A
      *
      * Set this register to control what happens on the output pin, 
@@ -101,31 +115,6 @@ void pwm_init() {
     // Set the corresponding PWM pin to output
     DDRB |= _BV( PB1 );
 
-    // Essentially, NOPs to sync up the timer
-/*    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
-    PORTB ^= (1 << PB4);
-    */
-
     /* TCCR0B: Timer/Counter Control Register B
      *
      * This register controls another range of functions. The key stuff here
@@ -137,8 +126,6 @@ void pwm_init() {
      * 
      */
 
-    // Set the clock source to be the internal one. CS00 is no prescaling. 
-    TCCR0B = _BV( CS00 );
 
 
     // The output frequency is CLK / 2 * prescale * (1 + OCROA)
@@ -147,6 +134,7 @@ void pwm_init() {
 }
 
 void sensor_read(uint8_t sample_number) {
+
     uint8_t read_complete = 0;
     uint8_t counter = 0;
     uint8_t phase = 0;
@@ -155,19 +143,24 @@ void sensor_read(uint8_t sample_number) {
 
     measurement[0] = 0;
     measurement[1] = 0;
-    measurement[2] = 0;
-    measurement[3] = 0;
 
     // Read a number of samples
     while(!read_complete) {
-
+        /*
+        sample = ADC; 
+        sample = 0x3ff;
+        measurement[0] = sample;
+        measurement[1] = sample;
+        read_complete = 1;
+*/
         // This blocks, waiting for the interrupt to hit.
         // Once the interrupt is hit, we drop out of the while, and do
         // everything that follows. 
         while(!adc_complete);
         // Read the sample, subtracting out half...
         //sample = ADC;
-        sample = ADC - 128;
+        //sample = ADC - 512;
+        sample = ADC;
         // Depending on which reading this is, stash it in the right place
         if(phase & 2) { 
             measurement[phase & 1] += sample;
@@ -179,14 +172,22 @@ void sensor_read(uint8_t sample_number) {
         // Incremement the phase betweem 0 and 3
         phase = (phase + 1) & 3;
         // If we've done all the reading we want to do, go home.
-        if(counter == sample_number) read_complete = 1;
-
+        if(counter == sample_number)  {
+            read_complete = 1;
+        }
     }
 }
 
 /* Deliver the goods back home 
  */
 void fetch_sensor_read(int16_t *inphase, int16_t *quad) {
+/*
+        if(measurement[0] != measurement[1]) {
+            PORTB ^= _BV(PIN4);
+            PORTB ^= _BV(PIN4);
+        }
+        */
+
     *inphase = measurement[0];
     *quad = measurement[1];
 }
@@ -200,7 +201,7 @@ void fetch_sensor_read(int16_t *inphase, int16_t *quad) {
 
 ISR(SIG_ADC) {
     // Pulse for debug
-//    PORTB ^= _BV ( PB4 );
-//    PORTB ^= _BV ( PB4 );
+    PORTB ^= _BV ( PB4 );
+    PORTB ^= _BV ( PB4 );
     adc_complete = 1;
 }
