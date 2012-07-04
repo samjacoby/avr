@@ -6,13 +6,14 @@
 #include "controller.h"
 
 uint8_t control_status; 
+uint8_t debug;
 
 int16_t inphase, quad;
 
-int8_t phase_sensor_val_h;
-int8_t phase_sensor_val_l;
-int8_t quad_sensor_val_h;
-int8_t quad_sensor_val_l;
+uint8_t phase_sensor_val_h;
+uint8_t phase_sensor_val_l;
+uint8_t quad_sensor_val_h;
+uint8_t quad_sensor_val_l;
 
 // Initialize status
 void controller_init(void) {
@@ -32,8 +33,6 @@ void controller_task(void) {
 
     switch(control_status) {
         case CONTROL_MODE_READ:
-            PORTB ^= _BV(PIN4);
-            PORTB ^= _BV(PIN4);
             adc_start();
             pwm_start();
             sensor_read(32);
@@ -52,16 +51,12 @@ void controller_task(void) {
 
 
 void controller_set_sensor_val(int16_t val, int16_t quad_val) {
-    // 16 bit values need to be mapped to distinc registers 
-    phase_sensor_val_h = (val & 0xff00) >> 8;
-    phase_sensor_val_l = val & 0x00ff;
-    quad_sensor_val_h = (quad_val & 0xff00) >> 8; 
-    quad_sensor_val_l = quad_val & 0x00ff; 
-    if(phase_sensor_val_l == 0) {
-        PORTB ^= _BV( PIN4 );
-        PORTB ^= _BV( PIN4 );
-
-    }
+    // 16 bit values need to be mapped to distinct "registers" 
+    // for relaying over the i2c. 
+    /    phase_sensor_val_l = (uint16_t) val & 0x00ff;
+    phase_sensor_val_h = (uint16_t) val >> 8;
+    quad_sensor_val_l = (uint16_t) quad_val & 0x00ff;  
+    quad_sensor_val_h = (uint16_t) quad_val >> 8; 
 }
 /*
 void controller_set_torque(int8_t torque) {

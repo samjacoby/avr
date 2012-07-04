@@ -15,11 +15,14 @@ uint8_t interface_read_reg(uint8_t reg) {
         case REG_INITIALS3: return INITIALS3;
         case REG_VERSION_L: return VERSION_L;
         case REG_VERSION_H: return VERSION_H;
+
         case REG_CONTROL: return control_status;
-        case REG_PHASE_SENSOR_VALUE_H: return phase_sensor_val_h;
+        case REG_DEBUG: return debug;
+
         case REG_PHASE_SENSOR_VALUE_L: return phase_sensor_val_l; 
+        case REG_PHASE_SENSOR_VALUE_H: return phase_sensor_val_h;
+        case REG_QUAD_SENSOR_VALUE_L: return quad_sensor_val_l; 
         case REG_QUAD_SENSOR_VALUE_H: return quad_sensor_val_h; 
-        case REG_QUAD_SENSOR_VALUE_L: return phase_sensor_val_l; 
 
         default: return 0xFF;
     }

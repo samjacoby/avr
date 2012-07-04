@@ -10,10 +10,14 @@
 
 #define REG_CONTROL 0x06
 
-#define REG_PHASE_SENSOR_VALUE_H 0x80
-#define REG_PHASE_SENSOR_VALUE_L 0x81
-#define REG_QUAD_SENSOR_VALUE_H 0x82
-#define REG_QUAD_SENSOR_VALUE_L 0x83
+#define REG_DEBUG 0x07
+
+// Littleendian byte-order
+#define REG_PHASE_SENSOR_VALUE_L 0x80
+#define REG_PHASE_SENSOR_VALUE_H 0x81
+
+#define REG_QUAD_SENSOR_VALUE_L 0x82
+#define REG_QUAD_SENSOR_VALUE_H 0x83
 
 
 #endif // __register_map_h_

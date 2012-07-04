@@ -13,12 +13,13 @@ extern uint8_t controller_status;
 extern int8_t controller_torque;
 */
 extern uint8_t control_status;
+extern uint8_t debug;
 
 // Store the high and low bytes of the ADC vals
-extern int8_t phase_sensor_val_h;
-extern int8_t phase_sensor_val_l;
-extern int8_t quad_sensor_val_h;
-extern int8_t quad_sensor_val_l;
+extern uint8_t phase_sensor_val_h;
+extern uint8_t phase_sensor_val_l;
+extern uint8_t quad_sensor_val_h;
+extern uint8_t quad_sensor_val_l;
 
 //void controller_init(void);
 //void controller_task(void);

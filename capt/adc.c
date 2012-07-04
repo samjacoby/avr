@@ -144,6 +144,11 @@ void sensor_read(uint8_t sample_number) {
     measurement[0] = 0;
     measurement[1] = 0;
 
+    int16_t samples[4];
+    samples[0] = 1;
+    samples[1] = 2;
+    samples[2] = 2;
+    samples[3] = 1;
     // Read a number of samples
     while(!read_complete) {
         /*
@@ -156,21 +161,31 @@ void sensor_read(uint8_t sample_number) {
         // This blocks, waiting for the interrupt to hit.
         // Once the interrupt is hit, we drop out of the while, and do
         // everything that follows. 
-        while(!adc_complete);
+        //while(!adc_complete);
         // Read the sample, subtracting out half...
         //sample = ADC;
+        sample = ADC - 512;
         //sample = ADC - 512;
-        sample = ADC;
+
+        //sample = samples[phase];
+
+        adc_complete = 0;
+
         // Depending on which reading this is, stash it in the right place
         if(phase & 2) { 
-            measurement[phase & 1] += sample;
-        } else {
             measurement[phase & 1] -= sample;
+//            measurement[phase & 1] = -128;
+        } else {
+            measurement[phase & 1] += sample;
+ //           measurement[phase & 1] = 128;
         }
         // If we're at the last read, add this to the tally.
+        
         if(phase == 3) counter++;
-        // Incremement the phase betweem 0 and 3
+
+        // Incremement the phase between 0 and 3
         phase = (phase + 1) & 3;
+
         // If we've done all the reading we want to do, go home.
         if(counter == sample_number)  {
             read_complete = 1;
@@ -181,15 +196,10 @@ void sensor_read(uint8_t sample_number) {
 /* Deliver the goods back home 
  */
 void fetch_sensor_read(int16_t *inphase, int16_t *quad) {
-/*
-        if(measurement[0] != measurement[1]) {
-            PORTB ^= _BV(PIN4);
-            PORTB ^= _BV(PIN4);
-        }
-        */
 
     *inphase = measurement[0];
     *quad = measurement[1];
+
 }
 
 /* Interrupt Code

@@ -48,7 +48,7 @@ ISR(USI_START_vect) {
 
 
     // Debug toggle
-    PORTB ^= (1<<PB4);
+    //PORTB ^= (1<<PB4);
 
     USISR = (1<<USISIF) | (1<<USIOIF);
     USICR |= (1<<USIOIE) | (1<<USISIE) | (1<<USIWM0) | (1<<USICS1) | (1<<USICS0);

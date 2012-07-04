@@ -16,15 +16,17 @@ class I2CInterface:
 
     def send_repeat_delay(self, addr, data, rxbytes, delay):
         while(1):
-
+            self.write(addr, 0x06, 1)
             sensor_val = self.send(addr, chr(data), rxbytes)
-            sensor_val = ord(sensor_val);
+            sensor_val = struct.unpack('<h', sensor_val)[0];
             sensor_quad_val = self.send(addr, chr(data + 2), rxbytes)
-            sensor_quad_val = ord(sensor_quad_val);
-            str = ''.join(['*' for num in xrange(sensor_val/10)])
+            sensor_quad_val = struct.unpack('<h', sensor_quad_val)[0];
+            #print "%d %d" % (sensor_val, sensor_quad_val)
+            print '< ------------ >'
+            str = ''.join(['*' for num in xrange(abs(sensor_val * 2)/3)])
 
             print str + ': %d' % sensor_val
-            str2 = ''.join(['#' for num in xrange(sensor_quad_val/10)])
+            str2 = ''.join(['#' for num in xrange(abs(sensor_quad_val * 2)/3)])
             print str2 + ': %d' % sensor_quad_val
 
             time.sleep(delay)
@@ -51,6 +53,7 @@ class I2CInterface:
         else:
             print "bad response header"
             return None
+   
 
     def write(self, addr, reg, val):
         self.send(addr, chr(reg) + chr(val), 0)
@@ -66,7 +69,7 @@ def main(argv):
     print argv
     addr = 0x4A;
     data = 0x80;
-    rxbytes = 1;
+    rxbytes = 2;
     i2c = I2CInterface(port=argv[0])
     
     i2c.send_repeat_delay(addr, data, rxbytes, float(argv[1]))
