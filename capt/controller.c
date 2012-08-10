@@ -53,7 +53,7 @@ void controller_task(void) {
 void controller_set_sensor_val(int16_t val, int16_t quad_val) {
     // 16 bit values need to be mapped to distinct "registers" 
     // for relaying over the i2c. 
-    /    phase_sensor_val_l = (uint16_t) val & 0x00ff;
+    phase_sensor_val_l = (uint16_t) val & 0x00ff;
     phase_sensor_val_h = (uint16_t) val >> 8;
     quad_sensor_val_l = (uint16_t) quad_val & 0x00ff;  
     quad_sensor_val_h = (uint16_t) quad_val >> 8; 

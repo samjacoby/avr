@@ -60,6 +60,7 @@ void loop(void) {
             nw = uart_getchar(1); // n bytes to write
             nr = uart_getchar(1); // n bytes to read
 
+            // this discards any overflow
             if(nw > 128) nw = 128;
             if(nr > 128) nr = 128;
             

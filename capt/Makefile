@@ -17,7 +17,7 @@ APPLICATION = application
 
 # Set up which MCU you're using, and what programmer, and the clock speed
 # here.
-MCU = attiny85
+MCU = attiny45
 PROGRAMMER = usbtiny
 #PROGRAMMER = avrispmkii
 F_CPU = 8000000UL
