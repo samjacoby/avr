@@ -1,0 +1,2 @@
+There is an issue with the timing on the reads, possibly -- which is why the lower bits are always different. The upper bits would be too, but they are always the same, so it doesn't make a difference.
+What would happen if we prevented any interrupts from firing during the sequence of a read? I2C also depends on interrupts. We could use a spare pin to signal when the signal is ready, and hold it somewhere -- in a buffer of sorts. Or we could iniate a read only on a certain command, so that it wouldn't be running in the same way.
