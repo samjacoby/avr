@@ -19,14 +19,14 @@ void setup(void) {
     TCCR0B = 1 << CS01;
 
     OCR0A = 53;         // regulates frequency. some number.
-    OCR0B = OCR0A / 2;  // constant duty-cucle of 50% 
+    OCR0B = 53;  // constant duty-cucle of 50% 
 
-    TCCR0A = 1 << COM0B0;
+    TCCR0A |= (1 << WGM01 ) | (1 << COM0B0);
 
     // Enable interrupts in the right places
-    TIMSK0 = 1 << OCIE0A;
+    TIMSK0 = 1 << OCIE0B;
 
-    DDRD = 1 << PD6;
+    DDRD |= 1 << PD5;
 
 }
 
