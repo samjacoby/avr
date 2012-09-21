@@ -1,12 +1,16 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <util/delay.h>
 
 // Define relevant registers in the slave device
 // #include "register_map.h"
 // Version information, for late queries and such.
 // #include "version.h"
 
-#define IR_FREG 38000L
+#define IR_FREQ 38000L
+#define FLICKER 18000
+
+volatile uint8_t ir_count;
 
 void setup(void) {
 
@@ -19,41 +23,46 @@ void setup(void) {
     // Run the timer w/ a prescale
     TCCR0B = 1 << CS01;
 
-    OCR0A = 50;     // regulates frequency. some number.
-    OCR0B = 25;     // constant duty-cucle of 50% 
+    OCR0A = 25;     // regulates frequency. some number.
+    OCR0B = 12;     // doesn't really do anything now... 
 
     TCCR0A |= (1 << WGM01 ) | (1 << COM0B0);
 
     // Enable interrupts in the right places
-    TIMSK0 = 1 << OCIE0B;
-
+    //TIMSK0 = 1 << OCIE0B;
 
     // CONFIGURE TIMER1
-    TCCR1A = (1 << WGM12); // CTC on OCR1A
-    TCCR1B = (1 << CS12);
+    TCCR1B |= (1 << WGM12) | (1 << CS11);   // CTC + Clock scaling 
 
-    OCR1AH = 0x0e; 
-    OCR1AL = 0xa6;
+    OCR1A = FLICKER / 64;
 
     TIMSK1 = (1 << OCIE1A); // Interrupt enable
-    
+
+    DDRB |= 0xff; 
+
 }
 
-volatile uint16_t ir_count;
-ISR(TIM1_COMPA) {
-    static uint16_t count;
-    count = (count + 1) & 0xffff; // rollover
 
+
+ISR(TIMER1_COMPA_vect) {
+    static uint8_t count;
+
+    count = (count + 1) & 0b11111111;
+
+    PORTB ^= (1 << PB4);
+    
     if(count < ir_count) { 
         DDRD |= 1 << PD5;
     } else {
-        DDRD &= ~(1 << PD5); 
+        PORTB |= (1 << PB3);
+        DDRD &= 0;
     }
+
 }
 
 
 void loop() {
-   ir_count = 1024; 
+    ir_count = 255;
 }
 
 int main(void) {
