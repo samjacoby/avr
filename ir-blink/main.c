@@ -9,6 +9,9 @@
 
 #define IR_FREQ 38000L
 #define FLICKER 3750
+#define F_CPU 16000000	// 16 MHz oscillator.
+#define BaudRate 9600
+#define MYUBRR (F_CPU / 16 / BaudRate ) - 1 
 
 volatile uint8_t ir_count;
 
@@ -44,14 +47,11 @@ void setup(void) {
 
 }
 
-#define F_CPU 16000000	// 16 MHz oscillator.
-#define BaudRate 9600
-#define MYUBRR (F_CPU / 16 / BaudRate ) - 1 
 
 /* Serial Funcs */
 void serialInit() {
  	/*Set baud rate */ 
-	UBRR0H = (unsigned char)(MYUBRR>>8); 
+	UBRR0H = (unsigned char) (MYUBRR>>8); 
 	UBRR0L = (unsigned char) MYUBRR; 
 	/* Enable receiver and transmitter   */
 	UCSR0B = (1<<RXEN0)|(1<<TXEN0); 
@@ -91,7 +91,6 @@ ISR(TIMER1_COMPA_vect) {
 
     count = (count + 1) & 0b00111111;
 
-    PORTB ^= (1 << PB4);
     
     if(count < ir_count) { 
         DDRD |= 1 << PD5;
@@ -106,6 +105,7 @@ ISR(TIMER1_COMPA_vect) {
 void loop() {
     sei();
     int i, inByte;
+    /*
     for(i = 0; i < 64; i++) {
         ir_count = i;
         _delay_ms(15);
@@ -116,11 +116,11 @@ void loop() {
         _delay_ms(15);
     }
     _delay_ms(60);
+    */
 
 	if (serialCheckRxComplete()) {
-		PORTB |= _BV(1); // Turn on LED @ PB1
+        PORTB ^= (1 << PB4);
 		inByte = serialRead();
-        PORTB &= !_BV(1);
     }
 }
 
