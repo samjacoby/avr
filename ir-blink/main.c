@@ -8,7 +8,7 @@
 // #include "version.h"
 
 #define IR_FREQ 38000L
-#define FLICKER 18000
+#define FLICKER 3750
 
 volatile uint8_t ir_count;
 
@@ -32,7 +32,7 @@ void setup(void) {
     //TIMSK0 = 1 << OCIE0B;
 
     // CONFIGURE TIMER1
-    TCCR1B |= (1 << WGM12) | (1 << CS11);   // CTC + Clock scaling 
+    TCCR1B |= (1 << WGM12) | (1 << CS11) | (1 << CS10);   // CTC + Clock scaling 
 
     OCR1A = FLICKER / 64;
 
@@ -47,11 +47,11 @@ void setup(void) {
 ISR(TIMER1_COMPA_vect) {
     static uint8_t count;
 
-    count = (count + 1) & 0b11111111;
+    count = (count + 1) & 0b00111111;
 
     PORTB ^= (1 << PB4);
     
-    if(count < ir_count) { 
+    if(count < 64) { 
         DDRD |= 1 << PD5;
     } else {
         PORTB |= (1 << PB3);
