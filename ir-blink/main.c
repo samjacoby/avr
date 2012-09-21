@@ -33,7 +33,6 @@ void setup(void) {
 
     // CONFIGURE TIMER1
     TCCR1B |= (1 << WGM12) | (1 << CS11) | (1 << CS10);   // CTC + Clock scaling 
-
     OCR1A = FLICKER / 64;
 
     TIMSK1 = (1 << OCIE1A); // Interrupt enable
@@ -51,7 +50,7 @@ ISR(TIMER1_COMPA_vect) {
 
     PORTB ^= (1 << PB4);
     
-    if(count < 64) { 
+    if(count < ir_count) { 
         DDRD |= 1 << PD5;
     } else {
         PORTB |= (1 << PB3);
@@ -62,13 +61,22 @@ ISR(TIMER1_COMPA_vect) {
 
 
 void loop() {
-    ir_count = 255;
+    sei();
+    int i;
+    for(i = 0; i < 64; i++) {
+        ir_count = i;
+        _delay_ms(10);
+    }
+    for(i = 63; i >= 0; i--) {
+        ir_count = i;
+        _delay_ms(10);
+    }
+    _delay_ms(120);
 }
 
 int main(void) {
 
     setup();
-    sei();
 
     while(1) {
         loop(); 
