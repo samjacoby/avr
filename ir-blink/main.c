@@ -44,6 +44,7 @@ void setup(void) {
     TIMSK1 = (1 << OCIE1A); // Interrupt enable
 
     DDRB |= 0xff; 
+    DDRC |= 0xff; 
 
 }
 
@@ -102,26 +103,68 @@ ISR(TIMER1_COMPA_vect) {
 }
 
 
+int inByteInt;
+unsigned char inByte;
 void loop() {
     sei();
-    int i, inByte;
-    /*
-    for(i = 0; i < 64; i++) {
-        ir_count = i;
-        _delay_ms(15);
-    }
-    _delay_ms(220);
-    for(i = 63; i >= 0; i--) {
-        ir_count = i;
-        _delay_ms(15);
-    }
-    _delay_ms(60);
-    */
 
 	if (serialCheckRxComplete()) {
-        PORTB ^= (1 << PB4);
+
 		inByte = serialRead();
+        ir_count = (int) inByte; 
+        //ir_count = 32; 
+        /*    
+        for(i = 0; i < 64; i++) {
+            ir_count = i;
+            _delay_ms(15);
+        }
+        _delay_ms(220);
+        for(i = 63; i >= 0; i--) {
+            ir_count = i;
+            _delay_ms(15);
+        }
+        _delay_ms(60);
+        */
+        
     }
+    /*
+    int readByte;
+    unsigned char readBytes[4];
+
+
+	if (serialCheckRxComplete()) {
+
+        PORTC ^= (1 << PC0);
+
+        //if(i > 3) {
+        //    i = 0;
+        //}
+
+		inByte = serialRead();
+        readByte = map(0, 9, 0, 64);
+        ir_count = 32; 
+
+        if(inByte == ' ') {
+            PORTB ^= (1 << PB4);
+            ir_count = 32;
+            //ir_count = atoi(readBytes);
+        }
+
+        //readBytes[i] = inByte;
+
+        //i++; 
+    }
+    PORTB |= (1 << PB4);
+    _delay_ms(1000);
+    PORTB &= ~(1 << PB4);
+    _delay_ms(1000);
+    ir_count = 32;
+    */
+}
+
+int map(int x, int in_min, int in_max, int out_min, int out_max)
+{
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
 int main(void) {
